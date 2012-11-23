@@ -1,0 +1,7 @@
+{
+    "wan_addr": "95.211.129.156",
+    "lan_net": "10.0.0.0",
+    "lan_mask": "8",
+    "wan_int": "eth0",
+    "lan_int": "eth1"
+}
