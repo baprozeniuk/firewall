@@ -27,7 +27,7 @@ def GenNat(wan_addr, lan_net, lan_mask, wan_int, lan_int):
 		'iptables -F FORWARD',
 		'iptables -A FORWARD -i %(wan_int)s  -o %(lan_int)s -m state --state ESTABLISHED,RELATED -j ACCEPT',
 		'iptables -A FORWARD -i %(lan_int)s -o %(wan_int)s -j ACCEPT',
-		'iptables -t nat -A POSTROUTING -s $(lan_net)s/%(lan_mask)s -o %(wan_int)s -j SNAT --to-source %(wan_addr)s',
+		'iptables -t nat -A POSTROUTING -s %(lan_net)s/%(lan_mask)s -o %(wan_int)s -j SNAT --to-source %(wan_addr)s',
 		'iptables -I POSTROUTING -t nat -o %(wan_int)s -d %(wan_addr)s -j MASQUERADE',
 		]
 	command = '\n'.join(commands)
@@ -51,17 +51,17 @@ def GenPortMap(ext_port,int_port,int_ip,proto):
 	command = '\n'.join(commands)
 	return command % locals()
 
-def GenOpenPort(port,proto,ext_int):
+def GenOpenPort(port,proto,int):
 	"""                                                         
 	FUNCTION NAME: GenOpenPort
 	INPUTS: port, protocol,extInt
 	OUTPUTS: opens a port to the router
-	NOTES:
+	NOTES: Opens a port on an interface
 
 	Sample output
 	iptables -I INPUT -i eth0 -p udp --dport 161 -j ACCEPT
 	"""
-	command = 'iptables -I INPUT -i %(ext_int)s -p %(proto)s --dport %(port)s -j ACCEPT'
+	command = 'iptables -I INPUT -i %(int)s -p %(proto)s --dport %(port)s -j ACCEPT'
 	return command % locals()
 
 
@@ -86,6 +86,7 @@ def main():
 	OUTPUTS: Firewall Script
 	NOTES: main routine, generates the firewall script 
 	"""
+	"""
 	#debug code
 	print "#nat"
 	print GenNat("95.211.129.156","10.0.0.0","8","eth0","eth1")
@@ -95,13 +96,28 @@ def main():
 	print GenOpenPort("5900","tcp","eth0")
 	print "#Static Route"
 	print GenStaticNetRoute("10.9.9.0","24","10.66.12.1")
-	nat_settings = open ('/etc/pyfw/nat.json','rb')
-	port_maps = open ('/etc/pyfw/port_maps.json','rb')
-	static_route = open ('/etc/pyfw/routes.json','rb')
-	open_ports = open ('/etc/pyfw/open_ports.json','rb')
+	"""
+	nat_settings_file = open ('/etc/pyfw/nat_settings.json','rb')
+	port_maps_file = open ('/etc/pyfw/port_maps.json','rb')
+	static_routes_file = open ('/etc/pyfw/routes.json','rb')
+	open_ports_file = open ('/etc/pyfw/open_ports.json','rb')
 
-	port_maps_json = json.loads(port_maps.read())
-	print port_maps_json
+
+		
+	nat_settings_json = json.loads(nat_settings_file.read())
+	print GenNat(nat_settings_json["wan_addr"],nat_settings_json["lan_net"],nat_settings_json["lan_mask"],nat_settings_json["wan_int"],nat_settings_json["lan_int"])
+			
+	port_maps_json = json.loads(port_maps_file.read())
+	for port_maps in port_maps_json["port_maps"]:
+		print GenPortMap(port_maps["src"],port_maps["dst"],port_maps["ip"],port_maps["proto"])	
+	
+	open_ports_json = json.loads(open_ports_file.read())
+	for open_ports in open_ports_json["open_ports"]:
+		print GenOpenPort(open_ports["port"],open_ports["proto"],open_ports["int"])
+	
+	static_routes_json = json.loads(static_routes_file.read())
+	for routes in static_routes_json["routes"]:
+		print GenStaticNetRoute(routes["net"],routes["mask"],routes["gw"])
 #start	
 if __name__ == "__main__":
     main()
