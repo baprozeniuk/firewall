@@ -1,4 +1,5 @@
 import sys
+import json
 
 def GenNat(wan_addr, lan_net, lan_mask, wan_int, lan_int):
 	"""                                                           
@@ -85,6 +86,7 @@ def main():
 	OUTPUTS: Firewall Script
 	NOTES: main routine, generates the firewall script 
 	"""
+	#debug code
 	print "#nat"
 	print GenNat("95.211.129.156","10.0.0.0","8","eth0","eth1")
 	print "#Port map"
@@ -93,6 +95,13 @@ def main():
 	print GenOpenPort("5900","tcp","eth0")
 	print "#Static Route"
 	print GenStaticNetRoute("10.9.9.0","24","10.66.12.1")
+	nat_settings = open ('/etc/pyfw/nat.json','rb')
+	port_maps = open ('/etc/pyfw/port_maps.json','rb')
+	static_route = open ('/etc/pyfw/routes.json','rb')
+	open_ports = open ('/etc/pyfw/open_ports.json','rb')
+
+	port_maps_json = json.loads(port_maps.read())
+	print port_maps_json
 #start	
 if __name__ == "__main__":
     main()
