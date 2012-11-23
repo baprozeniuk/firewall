@@ -73,7 +73,7 @@ iptables -I INPUT -i eth0 -p udp --dport 161 -j ACCEPT
 ##
 ###################################################################.
 def GenOpenPort(port,proto,extInt):
-	port = "iptables -I INPUT -i " + extInt + " -p " + proto + " --dport " + port + " + -j ACCEPT\n"
+	port = "iptables -I INPUT -i " + extInt + " -p " + proto + " --dport " + port + " -j ACCEPT\n"
 	return port
 ###################################################################
 ##                                                               
