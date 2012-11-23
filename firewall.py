@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys
 import json
 
@@ -97,10 +98,10 @@ def main():
 	print "#Static Route"
 	print GenStaticNetRoute("10.9.9.0","24","10.66.12.1")
 	"""
-	nat_settings_file = open ('/etc/pyfw/nat_settings.json','rb')
-	port_maps_file = open ('/etc/pyfw/port_maps.json','rb')
-	static_routes_file = open ('/etc/pyfw/routes.json','rb')
-	open_ports_file = open ('/etc/pyfw/open_ports.json','rb')
+	nat_settings_file = open ('conf/nat_settings.json','rb')
+	port_maps_file = open ('conf/port_maps.json','rb')
+	static_routes_file = open ('conf/routes.json','rb')
+	open_ports_file = open ('conf/open_ports.json','rb')
 
 
 		
@@ -109,7 +110,7 @@ def main():
 			
 	port_maps_json = json.loads(port_maps_file.read())
 	for port_maps in port_maps_json["port_maps"]:
-		print GenPortMap(port_maps["src"],port_maps["dst"],port_maps["ip"],port_maps["proto"])	
+		print GenPortMap(port_maps["ext_port"],port_maps["int_port"],port_maps["int_ip"],port_maps["proto"])	
 	
 	open_ports_json = json.loads(open_ports_file.read())
 	for open_ports in open_ports_json["open_ports"]:
