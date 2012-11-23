@@ -29,17 +29,17 @@ iptables -A FORWARD -i $WANINTERFACE -o $LANINTERFACE -m state --state ESTABLISH
 iptables -A FORWARD -i $LANINTERFACE -o $WANINTERFACE -j ACCEPT
 
 iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -o $WANINTERFACE -j SNAT --to-source $WANADDRESS
-iptables -I POSTROUTING -t nat -o $WANINTERFACE -d $WANADDRESS/24 -j MASQUERADE
+iptables -I POSTROUTING -t nat -o $WANINTERFACE -d $WANADDRESS -j MASQUERADE
 """
 ###################################################################
-def GenNat(WANAddr,WANMask,LANNet,LANMask,WANInt,LANInt):
+def GenNat(WANAddr,LANNet,LANMask,WANInt,LANInt):
 	nat = "sysctl -w net.ipv4.ip_forward=1\n"
 	nat += "iptables -P FORWARD ACCEPT\n"
 	nat += "iptables -F FORWARD\n"
 	nat += "iptables -A FORWARD -i " + WANInt + " -o " + LANInt + " -m state --state ESTABLISHED,RELATED -j ACCEPT\n"
 	nat += "iptables -A FORWARD -i " + LANInt + " -o " + WANInt + " -j ACCEPT\n"
 	nat += "iptables -t nat -A POSTROUTING -s " + LANNet + "/" + LANMask + " -o " + WANInt + " -j SNAT --to-source " + WANAddr + "\n"
-	nat += "iptables -I POSTROUTING -t nat -o " + WANInt + " -d " + WANAddr + "/" + WANMask + " -j MASQUERADE\n"
+	nat += "iptables -I POSTROUTING -t nat -o " + WANInt + " -d " + WANAddr " -j MASQUERADE\n"
 	return nat
 
 ###################################################################
