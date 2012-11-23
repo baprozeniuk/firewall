@@ -5,8 +5,8 @@ import json
 def GenNat(wan_addr, lan_net, lan_mask, wan_int, lan_int):
 	"""                                                           
 	FUNCTION NAME: GenNat
-	INPUTS: WANAddr, LANNet, WANInt, LANInt
-	OUTPUTS: NATScript
+	INPUTS: wan_addr lan_net, lan_mask, wan_int, lan_int
+	OUTPUTS: IP Tables commands in a string
 	NOTES: Generates the NAT components for IPv4
 
 	Sample output, with bash variables. should be different output from this
@@ -38,9 +38,9 @@ def GenPortMap(ext_port,int_port,int_ip,proto):
 	"""
 	FUNCTION NAME: GenPortMap
 	INPUTS: externalPort, internalPort, interalIP, protocol
-	OUTPUTS: portMap
+	OUTPUTS: 2 iptables lines representing a port map
 	NOTES: Generates an iptables port map
-	Results should look like
+	Sample Output
 
 	iptables -t nat -I PREROUTING -p tcp --dport 45678 -j DNAT --to 10.60.0.3:45678
 	iptables -I FORWARD -p tcp -d 10.60.0.3 --dport 45678 -j ACCEPT
@@ -55,8 +55,8 @@ def GenPortMap(ext_port,int_port,int_ip,proto):
 def GenOpenPort(port,proto,int):
 	"""                                                         
 	FUNCTION NAME: GenOpenPort
-	INPUTS: port, protocol,extInt
-	OUTPUTS: opens a port to the router
+	INPUTS: port, protocol, interface
+	OUTPUTS: IP tables command to open a port on an interface
 	NOTES: Opens a port on an interface
 
 	Sample output
@@ -104,7 +104,7 @@ def main():
 	open_ports_file = open ('conf/open_ports.json','rb')
 
 
-		
+	print '#!/bin/bash'	
 	nat_settings_json = json.loads(nat_settings_file.read())
 	print GenNat(nat_settings_json["wan_addr"],nat_settings_json["lan_net"],nat_settings_json["lan_mask"],nat_settings_json["wan_int"],nat_settings_json["lan_int"])
 			
