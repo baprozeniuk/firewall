@@ -1,0 +1,4 @@
+{
+    "wan_int": "ppp0",
+    "lan_int": "eth1"
+}
